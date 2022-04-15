@@ -43,7 +43,6 @@ namespace lqp {
 
   enum class SolverImplementation {
     Null,
-    Print,
     Glpk,
   };
 
@@ -51,11 +50,6 @@ namespace lqp {
 
   class NullSolver : public Solver {
   public:
-    bool available() const override;
-    SolverStatus solve(const Problem& problem, const SolverConfig& config) override;
-  };
-
-  class PrintSolver : public Solver {
     bool available() const override;
     SolverStatus solve(const Problem& problem, const SolverConfig& config) override;
   };

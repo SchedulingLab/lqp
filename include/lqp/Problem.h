@@ -40,6 +40,11 @@ namespace lqp {
     bool is_feasible(const Instance& instance) const;
     double compute_objective_value(const Instance& instance) const;
 
+    void print() const;
+
+  private:
+    void print_expr(const QExpr& expr) const;
+
   private:
     friend class Solver;
 

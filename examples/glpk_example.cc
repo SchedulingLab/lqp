@@ -13,9 +13,7 @@ int main() {
   problem.add_constraint(2 * x_1 + 2 * x_2 + 6 * x_3 <= 300.0, "r");
 
   problem.set_objective(lqp::Sense::Maximize, 10 * x_1 + 6 * x_2 + 4 * x_3, "z");
-
-  auto printer = lqp::make_solver(lqp::SolverImplementation::Print);
-  printer->solve(problem);
+  problem.print();
 
   auto solver = lqp::make_solver(lqp::SolverImplementation::Glpk);
 

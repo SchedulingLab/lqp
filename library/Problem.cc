@@ -230,35 +230,81 @@ namespace lqp {
     return m_objective.expression.evaluate(instance);
   }
 
-#if 0
-  std::ostream& Problem::print(std::ostream& out) const {
-    out << "Objective:\n";
-    out << m_objective.expr << '\n';
+  void Problem::print() const {
+    switch (m_objective.sense) {
+      case Sense::Maximize:
+        std::fputs("Maximize", stdout);
+        break;
+      case Sense::Minimize:
+        std::fputs("Minimize", stdout);
+        break;
+    }
 
-    out << "Constraints:\n";
+    if (!m_objective.name.empty()) {
+      std::printf(" '%s': ", m_objective.name.c_str());
+    } else {
+      std::fputs(": ", stdout);
+    }
 
-    for (auto& constr : m_constraints) {
-      switch (constr.range.type) {
-        case Range::LowerBounded:
-          out << constr.expr << " >= " << constr.range.lower << '\n';
+    print_expr(m_objective.expression);
+    std::puts("");
+
+    for (auto & constraint : m_constraints) {
+      if (!constraint.name.empty()) {
+        std::printf("(%s) ", constraint.name.c_str());
+      }
+
+      switch (constraint.range.type) {
+        case VariableRange::LowerBounded:
+          print_expr(constraint.expression);
+          std::printf(" >= %g", constraint.range.lower);
           break;
-        case Range::UpperBounded:
-          out << constr.expr << " <= " << constr.range.upper << '\n';
+        case VariableRange::UpperBounded:
+          print_expr(constraint.expression);
+          std::printf(" <= %g", constraint.range.upper);
           break;
-        case Range::Bounded:
-          out << constr.range.lower << " <= " << constr.expr << " <= " << constr.range.upper << '\n';
+        case VariableRange::Bounded:
+          std::printf("%g <= ", constraint.range.lower);
+          print_expr(constraint.expression);
+          std::printf(" <= %g", constraint.range.upper);
           break;
-        case Range::Fixed:
-          out << constr.expr << " == " << constr.range.lower << '\n';
+        case VariableRange::Fixed:
+          print_expr(constraint.expression);
+          std::printf(" == %g", constraint.range.lower);
           break;
-        case Range::Unbounded:
+        default:
           assert(false);
           break;
       }
+
+      std::puts("");
+    }
+  }
+
+  void Problem::print_expr(const QExpr& expr) const {
+    bool first = true;
+
+    double constant = expr.constant();
+
+    if (constant != 0.0) {
+      std::printf("%g", constant);
+      first = false;
     }
 
-    return out;
+    auto linear_terms = expr.linear_terms();
+
+    for (auto & term : linear_terms) {
+      if (first) {
+        first = false;
+      } else {
+        std::fputs(" + ", stdout);
+      }
+
+      std::printf("%g * %s", term.coefficient, variable_name(term.variable).c_str());
+    }
+
+    // TODO: quadratic terms
+
   }
-#endif
 
 }
