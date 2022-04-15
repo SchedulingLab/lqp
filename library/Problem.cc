@@ -1,0 +1,179 @@
+#include <lqp/Problem.h>
+
+#include <cassert>
+#include <cmath>
+#include <iostream>
+
+#include <lqp/Instance.h>
+
+namespace lqp {
+
+  VariableId Problem::add_variable(VariableCategory category, std::string name) {
+    Variable variable;
+
+    variable.category = category;
+
+    if (category == VariableCategory::Binary) {
+      variable.range.type = VariableRange::Bounded;
+      variable.range.lower = 0.0;
+      variable.range.upper = 1.0;
+    } else {
+      variable.range.type = VariableRange::Unbounded;
+    }
+
+    variable.name = std::move(name);
+
+    std::size_t index = m_variables.size();
+    m_variables.push_back(std::move(variable));
+    return VariableId{index};
+  }
+
+  VariableId Problem::add_variable(VariableCategory category, VariableRange range, std::string name) {
+    Variable variable;
+
+    variable.category = category;
+    variable.range = range;
+    variable.name = std::move(name);
+
+    std::size_t index = m_variables.size();
+    m_variables.push_back(std::move(variable));
+    return VariableId{index};
+  }
+
+  ConstraintId Problem::add_constraint(Inequality inequality, std::string name) {
+    Constraint constraint;
+
+    constraint.expression = std::move(inequality.expression);
+
+    switch (inequality.op) {
+      case Operator::GreaterEqual:
+        constraint.range = lower_bound(0.0);
+        break;
+      case Operator::Equal:
+        constraint.range = fixed(0.0);
+        break;
+      case Operator::LessEqual:
+        constraint.range = upper_bound(0.0);
+        break;
+    }
+
+    constraint.name = std::move(name);
+
+    std::size_t index = m_constraints.size();
+    m_constraints.push_back(std::move(constraint));
+    return ConstraintId{index};
+  }
+
+  void Problem::set_objective(Sense sense, const LExpr& expr, std::string name) {
+    m_objective = { sense, expr, std::move(name) };
+  }
+
+  std::string Problem::variable_name(VariableId variable) const {
+    std::size_t index = to_index(variable);
+    assert(index < m_variables.size());
+
+    if (!m_variables[index].name.empty()) {
+      return m_variables[index].name;
+    }
+
+    return "v" + std::to_string(index);
+  }
+
+  bool Problem::is_linear() const {
+    for (auto & constraint : m_constraints) {
+      if (!constraint.expression.is_linear()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool Problem::is_feasible(const Instance& instance) const {
+    // 1. verify that the variables well defined
+
+    std::size_t index = 0;
+
+    for (auto & problem_variable : m_variables) {
+      VariableId variable{index};
+      double value = instance.value(variable);
+
+      switch (problem_variable.category) {
+        case VariableCategory::Binary:
+          if (value != 0.0 && value != 1.0) {
+            return false;
+          }
+
+          break;
+
+        case VariableCategory::Integer:
+          if (std::trunc(value) != value) {
+            return false;
+          }
+
+          if (!problem_variable.range.has_value(value)) {
+            return false;
+          }
+
+          break;
+
+        case VariableCategory::Continuous:
+          if (!problem_variable.range.has_value(value)) {
+            return false;
+          }
+
+          break;
+      }
+
+      ++index;
+    }
+
+    // 2. Verify that the constraints are satisfied
+
+    for (auto & problem_constraint : m_constraints) {
+      double value = problem_constraint.expression.evaluate(instance);
+
+      if (!problem_constraint.range.has_value(value)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  double Problem::compute_objective_value(const Instance& instance) const {
+    return m_objective.expression.evaluate(instance);
+  }
+
+#if 0
+  std::ostream& Problem::print(std::ostream& out) const {
+    out << "Objective:\n";
+    out << m_objective.expr << '\n';
+
+    out << "Constraints:\n";
+
+    for (auto& constr : m_constraints) {
+      switch (constr.range.type) {
+        case Range::LowerBounded:
+          out << constr.expr << " >= " << constr.range.lower << '\n';
+          break;
+        case Range::UpperBounded:
+          out << constr.expr << " <= " << constr.range.upper << '\n';
+          break;
+        case Range::Bounded:
+          out << constr.range.lower << " <= " << constr.expr << " <= " << constr.range.upper << '\n';
+          break;
+        case Range::Fixed:
+          out << constr.expr << " == " << constr.range.lower << '\n';
+          break;
+        case Range::Unbounded:
+          assert(false);
+          break;
+      }
+    }
+
+    return out;
+  }
+#endif
+
+}
