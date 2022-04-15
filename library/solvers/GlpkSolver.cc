@@ -47,10 +47,16 @@ namespace lqp {
   }
 
   SolverStatus GlpkSolver::solve(const Problem& problem, const SolverConfig& config) {
-    if (!problem.is_linear()) {
-      // TODO: linearize if possible
-      std::printf("Not linear!\n");
-      return SolverStatus::Error;
+    Problem linear_problem = problem;
+
+    if (!linear_problem.is_linear()) {
+      auto maybe_linear_problem = problem.linearize();
+
+      if (!maybe_linear_problem) {
+        return SolverStatus::Error;
+      }
+
+      linear_problem = *maybe_linear_problem;
     }
 
     if (m_problem != nullptr) {
@@ -72,7 +78,7 @@ namespace lqp {
      * objective
      */
 
-    auto raw_objective = objective(problem);
+    auto raw_objective = objective(linear_problem);
 
     glp_set_obj_name(m_problem, raw_objective.name.c_str());
 
@@ -89,7 +95,7 @@ namespace lqp {
      * cols (variables)
      */
 
-    auto raw_variables = variables(problem);
+    auto raw_variables = variables(linear_problem);
 
     glp_add_cols(m_problem, raw_variables.size());
 
@@ -146,7 +152,7 @@ namespace lqp {
      * rows (constraints)
      */
 
-    auto raw_constraints = constraints(problem);
+    auto raw_constraints = constraints(linear_problem);
 
     glp_add_rows(m_problem, raw_constraints.size());
 

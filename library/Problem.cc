@@ -89,6 +89,91 @@ namespace lqp {
     return true;
   }
 
+  std::optional<Problem> Problem::linearize() const {
+    if (is_linear()) {
+      return *this;
+    }
+
+    Problem result;
+    result.m_variables = m_variables;
+    result.m_objective = m_objective;
+
+    for (auto & constraint : m_constraints) {
+      if (constraint.expression.is_linear()) {
+        result.m_constraints.push_back(constraint);
+        continue;
+      }
+
+      QExpr expression = constraint.expression.constant();
+      auto linear_terms = constraint.expression.linear_terms();
+
+      for (auto & term : linear_terms) {
+        expression += term.coefficient * term.variable;
+      }
+
+      std::map<std::tuple<VariableId, VariableId>, VariableId> mapping;
+      auto quadratic_terms = constraint.expression.quadratic_terms();
+
+      for (auto & term : quadratic_terms) {
+        auto v0 = term.variables[0];
+        auto v1 = term.variables[1];
+
+        auto c0 = m_variables[to_index(v0)].category;
+        auto c1 = m_variables[to_index(v1)].category;
+
+        if (c0 == VariableCategory::Binary && c1 == VariableCategory::Binary) {
+          auto it = mapping.find(std::make_tuple(v0, v1));
+
+          VariableId variable;
+
+          if (it != mapping.end()) {
+            variable = it->second;
+          } else {
+            auto variable = result.add_variable(VariableCategory::Binary);
+            mapping.insert({ std::make_tuple(v0, v1), variable });
+            result.add_constraint(variable >= v0 + v1 - 1);
+            result.add_constraint(variable <= 0.5 * (v0 + v1));
+          }
+
+          expression += term.coefficient * variable;
+        } else if ((c0 == VariableCategory::Binary && c1 == VariableCategory::Continuous) || (c1 == VariableCategory::Binary && c0 == VariableCategory::Continuous)) {
+          if (c1 == VariableCategory::Binary && c0 == VariableCategory::Continuous) {
+            std::swap(v0, v1);
+          }
+
+          auto range = m_variables[to_index(v1)].range;
+
+          if (range.type != VariableRange::Bounded || range.lower != 0.0) {
+            return std::nullopt;
+          }
+
+          auto it = mapping.find(std::make_tuple(v0, v1));
+
+          VariableId variable;
+
+          if (it != mapping.end()) {
+            variable = it->second;
+          } else {
+            auto variable = result.add_variable(VariableCategory::Continuous, range);
+            mapping.insert({ std::make_tuple(v0, v1), variable });
+            result.add_constraint(variable <= range.upper * v0);
+            result.add_constraint(variable <= v1);
+            result.add_constraint(variable >= v1 - (1.0 - v0) * range.upper);
+          }
+
+          expression += term.coefficient * variable;
+        } else {
+          return std::nullopt;
+        }
+      }
+
+      result.m_constraints.push_back({ expression, constraint.range, constraint.name });
+    }
+
+    return std::nullopt;
+  }
+
+
   bool Problem::is_feasible(const Instance& instance) const {
     // 1. verify that the variables well defined
 

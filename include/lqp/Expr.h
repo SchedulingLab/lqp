@@ -65,10 +65,35 @@ namespace lqp {
   }
 
   inline
+  LExpr operator+(double rhs, const LExpr& lhs) {
+    return LExpr(rhs) + lhs;
+  }
+
+  inline
+  LExpr operator+(const LExpr& rhs, double lhs) {
+    return rhs + LExpr(lhs);
+  }
+
+  inline
   LExpr operator-(const LExpr& lhs, const LExpr& rhs) {
     LExpr expr(lhs);
     expr -= rhs;
     return expr;
+  }
+
+  inline
+  LExpr operator-(VariableId rhs, VariableId lhs) {
+    return LExpr(rhs) - LExpr(lhs);
+  }
+
+  inline
+  LExpr operator-(double rhs, const LExpr& lhs) {
+    return LExpr(rhs) - lhs;
+  }
+
+  inline
+  LExpr operator-(const LExpr& rhs, double lhs) {
+    return rhs - LExpr(lhs);
   }
 
   inline

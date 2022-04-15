@@ -2,6 +2,7 @@
 #define LQP_PROBLEM_H
 
 #include <iosfwd>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -34,6 +35,7 @@ namespace lqp {
     std::string variable_name(VariableId var) const;
 
     bool is_linear() const;
+    std::optional<Problem> linearize() const;
 
     bool is_feasible(const Instance& instance) const;
     double compute_objective_value(const Instance& instance) const;
