@@ -3,9 +3,11 @@
 
 #include <cstddef>
 
+#include "Api.h"
+
 namespace lqp {
 
-  struct VariableId {
+  struct LQP_API VariableId {
     std::size_t index;
   };
 
@@ -36,7 +38,7 @@ namespace lqp {
     Binary,
   };
 
-  struct VariableRange {
+  struct LQP_API VariableRange {
     enum Type {
       Unbounded,
       LowerBounded,
@@ -52,10 +54,10 @@ namespace lqp {
     bool has_value(double value) const;
   };
 
-  VariableRange upper_bound(double value);
-  VariableRange lower_bound(double value);
-  VariableRange bounds(double lower, double upper);
-  VariableRange fixed(double value);
+  LQP_API VariableRange upper_bound(double value);
+  LQP_API VariableRange lower_bound(double value);
+  LQP_API VariableRange bounds(double lower, double upper);
+  LQP_API VariableRange fixed(double value);
 
 }
 

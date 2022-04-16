@@ -5,6 +5,7 @@
 #include <chrono>
 #include <filesystem>
 
+#include "Api.h"
 #include "Problem.h"
 
 namespace lqp {
@@ -20,7 +21,7 @@ namespace lqp {
     NotSolved,
   };
 
-  struct SolverConfig {
+  struct LQP_API SolverConfig {
     bool use_mip = false;
     bool verbose = true;
     bool presolve = false;
@@ -29,7 +30,7 @@ namespace lqp {
     std::filesystem::path solution_output;
   };
 
-  class Solver {
+  class LQP_API Solver {
   public:
     virtual ~Solver();
 
@@ -48,9 +49,9 @@ namespace lqp {
     Gurobi,
   };
 
-  std::unique_ptr<Solver> make_solver(SolverImplementation implementation);
+  LQP_API std::unique_ptr<Solver> make_solver(SolverImplementation implementation);
 
-  class NullSolver : public Solver {
+  class LQP_API NullSolver : public Solver {
   public:
     bool available() const override;
     SolverStatus solve(const Problem& problem, const SolverConfig& config) override;

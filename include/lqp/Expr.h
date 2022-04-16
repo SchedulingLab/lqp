@@ -3,24 +3,25 @@
 
 #include <vector>
 
+#include "Api.h"
 #include "Variable.h"
 
 namespace lqp {
 
   class Instance;
 
-  struct ExprLinearTerm {
+  struct LQP_API ExprLinearTerm {
     double coefficient;
     VariableId variable;
   };
 
-  struct ExprQuadraticTerm {
+  struct LQP_API ExprQuadraticTerm {
     double coefficient;
     VariableId variables[2];
   };
 
   // linear expression
-  class LExpr {
+  class LQP_API LExpr {
   public:
     LExpr();
     LExpr(double constant);
@@ -128,7 +129,7 @@ namespace lqp {
   }
 
 
-  class QExpr {
+  class LQP_API QExpr {
   public:
     QExpr();
     QExpr(double constant);

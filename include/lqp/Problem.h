@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "Api.h"
 #include "Expr.h"
 #include "Inequality.h"
 #include "Variable.h"
@@ -14,7 +15,7 @@ namespace lqp {
 
   class Instance;
 
-  struct ConstraintId {
+  struct LQP_API ConstraintId {
     std::size_t index;
   };
 
@@ -23,7 +24,7 @@ namespace lqp {
     Maximize,
   };
 
-  class Problem {
+  class LQP_API Problem {
   public:
     VariableId add_variable(VariableCategory category, std::string name = "");
     VariableId add_variable(VariableCategory category, VariableRange range, std::string name = "");

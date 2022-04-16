@@ -1,6 +1,7 @@
 #ifndef LQP_INEQUALITY_H
 #define LQP_INEQUALITY_H
 
+#include "Api.h"
 #include "Expr.h"
 
 namespace lqp {
@@ -11,14 +12,14 @@ namespace lqp {
     LessEqual,
   };
 
-  struct Inequality {
+  struct LQP_API Inequality {
     QExpr expression;
     Operator op;
   };
 
-  Inequality operator<=(const QExpr& lhs, const QExpr& rhs);
-  Inequality operator>=(const QExpr& lhs, const QExpr& rhs);
-  Inequality operator==(const QExpr& lhs, const QExpr& rhs);
+  LQP_API Inequality operator<=(const QExpr& lhs, const QExpr& rhs);
+  LQP_API Inequality operator>=(const QExpr& lhs, const QExpr& rhs);
+  LQP_API Inequality operator==(const QExpr& lhs, const QExpr& rhs);
 
 }
 

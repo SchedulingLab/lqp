@@ -3,11 +3,12 @@
 
 #include <map>
 
+#include "Api.h"
 #include "Variable.h"
 
 namespace lqp {
 
-  class Instance {
+  class LQP_API Instance {
   public:
 
     void set_value(VariableId variable, double value);
