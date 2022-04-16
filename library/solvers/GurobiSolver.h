@@ -25,6 +25,16 @@ namespace lqp {
 
 }
 
+#else
+
+#include <lqp/Solver.h>
+
+namespace lqp {
+
+  using GurobiSolver = NullSolver;
+
+}
+
 #endif
 
 #endif // LQP_GUROBI_SOLVER_H

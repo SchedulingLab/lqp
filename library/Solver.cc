@@ -32,11 +32,7 @@ namespace lqp {
       case SolverImplementation::Glpk:
         return std::make_unique<GlpkSolver>();
       case SolverImplementation::Gurobi:
-#if LQP_HAS_GUROBI
         return std::make_unique<GurobiSolver>();
-#else
-        return std::make_unique<NullSolver>();
-#endif
     }
 
     return std::make_unique<NullSolver>();
