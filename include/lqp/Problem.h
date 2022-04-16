@@ -13,7 +13,7 @@
 
 namespace lqp {
 
-  class Instance;
+  class Solution;
 
   struct LQP_API ConstraintId {
     std::size_t index;
@@ -38,8 +38,8 @@ namespace lqp {
     bool is_linear() const;
     std::optional<Problem> linearize() const;
 
-    bool is_feasible(const Instance& instance) const;
-    double compute_objective_value(const Instance& instance) const;
+    bool is_feasible(const Solution& solution) const;
+    double compute_objective_value(const Solution& solution) const;
 
     void print() const;
 

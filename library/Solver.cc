@@ -9,6 +9,36 @@
 #include "config.h"
 
 namespace lqp {
+  /*
+   * SolverResult
+   */
+
+  SolverResult::SolverResult(SolverStatus status)
+  : m_status(status)
+  {
+  }
+
+  SolverResult::SolverResult(SolverStatus status, Solution solution)
+  : m_status(status)
+  , m_solution(std::move(solution))
+  {
+  }
+
+  SolverStatus SolverResult::status() const {
+    return m_status;
+  }
+
+  bool SolverResult::has_solution() const {
+    return !m_solution.empty();
+  }
+
+  Solution SolverResult::solution() {
+    return m_solution;
+  }
+
+  /*
+   * Solver
+   */
 
   Solver::~Solver() = default;
 
@@ -42,10 +72,8 @@ namespace lqp {
     return false;
   }
 
-  SolverStatus NullSolver::solve([[maybe_unused]] const Problem& problem, [[maybe_unused]] const SolverConfig& config) {
+  SolverResult NullSolver::solve([[maybe_unused]] const Problem& problem, [[maybe_unused]] const SolverConfig& config) {
     return SolverStatus::NotSolved;
   }
 
 }
-
-

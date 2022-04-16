@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 
-#include <lqp/Instance.h>
+#include <lqp/Solution.h>
 
 namespace lqp {
 
@@ -174,14 +174,14 @@ namespace lqp {
   }
 
 
-  bool Problem::is_feasible(const Instance& instance) const {
+  bool Problem::is_feasible(const Solution& solution) const {
     // 1. verify that the variables well defined
 
     std::size_t index = 0;
 
     for (auto & problem_variable : m_variables) {
       VariableId variable{index};
-      double value = instance.value(variable);
+      double value = solution.value(variable);
 
       switch (problem_variable.category) {
         case VariableCategory::Binary:
@@ -216,7 +216,7 @@ namespace lqp {
     // 2. Verify that the constraints are satisfied
 
     for (auto & problem_constraint : m_constraints) {
-      double value = problem_constraint.expression.evaluate(instance);
+      double value = problem_constraint.expression.evaluate(solution);
 
       if (!problem_constraint.range.has_value(value)) {
         return false;
@@ -226,8 +226,8 @@ namespace lqp {
     return true;
   }
 
-  double Problem::compute_objective_value(const Instance& instance) const {
-    return m_objective.expression.evaluate(instance);
+  double Problem::compute_objective_value(const Solution& solution) const {
+    return m_objective.expression.evaluate(solution);
   }
 
   void Problem::print() const {

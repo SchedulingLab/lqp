@@ -46,7 +46,7 @@ namespace lqp {
     return true;
   }
 
-  SolverStatus GlpkSolver::solve(const Problem& problem, const SolverConfig& config) {
+  SolverResult GlpkSolver::solve(const Problem& problem, const SolverConfig& config) {
     Problem linear_problem = problem;
 
     if (!linear_problem.is_linear()) {

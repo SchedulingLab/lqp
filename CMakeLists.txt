@@ -43,8 +43,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/library/config.h.in ${CMAKE_CURRENT_B
 add_library(lqp0
   library/Expr.cc
   library/Inequality.cc
-  library/Instance.cc
   library/Problem.cc
+  library/Solution.cc
   library/Solver.cc
   library/Variable.cc
 

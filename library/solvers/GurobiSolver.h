@@ -16,7 +16,7 @@ namespace lqp {
     GurobiSolver();
 
     bool available() const override;
-    SolverStatus solve(const Problem& problem, const SolverConfig& config) override;
+    SolverResult solve(const Problem& problem, const SolverConfig& config) override;
 
   private:
     GRBEnv m_env;

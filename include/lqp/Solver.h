@@ -7,6 +7,7 @@
 
 #include "Api.h"
 #include "Problem.h"
+#include "Solution.h"
 
 namespace lqp {
 
@@ -19,6 +20,21 @@ namespace lqp {
     UnboundedSolution,
     Undefined,
     NotSolved,
+  };
+
+  class LQP_API SolverResult {
+  public:
+    SolverResult(SolverStatus status);
+    SolverResult(SolverStatus status, Solution solution);
+
+    SolverStatus status() const;
+
+    bool has_solution() const;
+    Solution solution();
+
+  private:
+    SolverStatus m_status;
+    Solution m_solution;
   };
 
   struct LQP_API SolverConfig {
@@ -35,7 +51,7 @@ namespace lqp {
     virtual ~Solver();
 
     virtual bool available() const = 0;
-    virtual SolverStatus solve(const Problem& problem, const SolverConfig& config = SolverConfig()) = 0;
+    virtual SolverResult solve(const Problem& problem, const SolverConfig& config = SolverConfig()) = 0;
 
   protected:
     static std::vector<Problem::Variable> variables(const Problem& problem);
@@ -54,7 +70,7 @@ namespace lqp {
   class LQP_API NullSolver : public Solver {
   public:
     bool available() const override;
-    SolverStatus solve(const Problem& problem, const SolverConfig& config) override;
+    SolverResult solve(const Problem& problem, const SolverConfig& config) override;
   };
 
 }

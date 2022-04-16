@@ -13,7 +13,7 @@ namespace lqp {
     ~GlpkSolver();
 
     bool available() const override;
-    SolverStatus solve(const Problem& problem, const SolverConfig& config) override;
+    SolverResult solve(const Problem& problem, const SolverConfig& config) override;
 
   private:
     glp_prob *m_problem;

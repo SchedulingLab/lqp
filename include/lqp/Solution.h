@@ -1,5 +1,5 @@
-#ifndef LQP_INSTANCE_H
-#define LQP_INSTANCE_H
+#ifndef LQP_SOLUTION_H
+#define LQP_SOLUTION_H
 
 #include <map>
 
@@ -8,8 +8,10 @@
 
 namespace lqp {
 
-  class LQP_API Instance {
+  class LQP_API Solution {
   public:
+    bool empty() const;
+    void clear();
 
     void set_value(VariableId variable, double value);
     double value(VariableId variable) const;
@@ -20,4 +22,4 @@ namespace lqp {
 
 }
 
-#endif // LQP_INSTANCE_H
+#endif // LQP_SOLUTION_H

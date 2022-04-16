@@ -14,9 +14,9 @@ namespace lqp {
     return true;
   }
 
-  SolverStatus GurobiSolver::solve(const Problem& problem, const SolverConfig& config) {
+  SolverResult GurobiSolver::solve(const Problem& problem, const SolverConfig& config) {
     // TODO
-    return SolverStatus::Error;
+    return SolverStatus::NotSolved;
   }
 
 }

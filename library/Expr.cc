@@ -4,7 +4,7 @@
 #include <map>
 #include <tuple>
 
-#include <lqp/Instance.h>
+#include <lqp/Solution.h>
 
 namespace lqp {
 
@@ -106,11 +106,11 @@ namespace lqp {
     return *this;
   }
 
-  double LExpr::evaluate(const Instance& instance) const {
+  double LExpr::evaluate(const Solution& solution) const {
     double value = m_constant;
 
     for (auto& term : m_linear_terms) {
-      value += term.coefficient * instance.value(term.variable);
+      value += term.coefficient * solution.value(term.variable);
     }
 
     return value;
@@ -308,15 +308,15 @@ namespace lqp {
     return *this;
   }
 
-  double QExpr::evaluate(const Instance& instance) const {
+  double QExpr::evaluate(const Solution& solution) const {
     double value = m_constant;
 
     for (auto& term : m_linear_terms) {
-      value += term.coefficient * instance.value(term.variable);
+      value += term.coefficient * solution.value(term.variable);
     }
 
     for (auto& term : m_quadratic_terms) {
-      value += term.coefficient * instance.value(term.variables[0]) * instance.value(term.variables[1]);
+      value += term.coefficient * solution.value(term.variables[0]) * solution.value(term.variables[1]);
     }
 
     return value;

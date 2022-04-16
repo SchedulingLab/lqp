@@ -8,7 +8,7 @@
 
 namespace lqp {
 
-  class Instance;
+  class Solution;
 
   struct LQP_API ExprLinearTerm {
     double coefficient;
@@ -41,7 +41,7 @@ namespace lqp {
     LExpr& operator*=(double factor);
     LExpr& operator/=(double factor);
 
-    double evaluate(const Instance& instance) const;
+    double evaluate(const Solution& solution) const;
 
   private:
     void normalize();
@@ -155,7 +155,7 @@ namespace lqp {
     QExpr& operator*=(double factor);
     QExpr& operator/=(double factor);
 
-    double evaluate(const Instance& instance) const;
+    double evaluate(const Solution& solution) const;
 
   private:
     void normalize();
