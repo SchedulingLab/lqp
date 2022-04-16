@@ -17,6 +17,7 @@ namespace lqp {
     NoFeasibleSolution,
     UnboundedSolution,
     Undefined,
+    NotSolved,
   };
 
   struct SolverConfig {

@@ -47,7 +47,7 @@ namespace lqp {
   }
 
   SolverStatus NullSolver::solve([[maybe_unused]] const Problem& problem, [[maybe_unused]] const SolverConfig& config) {
-    return SolverStatus::Error;
+    return SolverStatus::NotSolved;
   }
 
 }
