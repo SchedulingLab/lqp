@@ -48,10 +48,6 @@ find_path(GLPK_INCLUDE_DIR glpk.h
     ${GLPK_SEARCH_PATHS}
 )
 
-if(NOT GLPK_INCLUDE_DIR)
-  message(FATAL_ERROR "Could not find GLPK include directory.")
-endif()
-
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args("GLPK" DEFAULT_MSG
@@ -59,15 +55,11 @@ find_package_handle_standard_args("GLPK" DEFAULT_MSG
   GLPK_INCLUDE_DIR
 )
 
-message(STATUS "GLPK include directory: ${GLPK_INCLUDE_DIR}")
-message(STATUS "GLPK library: ${GLPK_LIBRARY}")
+if(GLPK_FOUND)
+  message(STATUS "GLPK include directory: ${GLPK_INCLUDE_DIR}")
+endif()
 
-mark_as_advanced(
-  GLPK_LIBRARY
-  GLPK_INCLUDE_DIR
-)
-
-if(NOT TARGET GLPK::GLPK)
+if(GLPK_FOUND AND NOT TARGET GLPK::GLPK)
   add_library(GLPK::GLPK UNKNOWN IMPORTED)
   set_target_properties(GLPK::GLPK
     PROPERTIES
@@ -75,3 +67,8 @@ if(NOT TARGET GLPK::GLPK)
       INTERFACE_INCLUDE_DIRECTORIES "${GLPK_INCLUDE_DIR}"
   )
 endif()
+
+mark_as_advanced(
+  GLPK_LIBRARY
+  GLPK_INCLUDE_DIR
+)

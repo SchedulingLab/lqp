@@ -1,0 +1,6 @@
+#ifndef LQP_CONFIG_H
+#define LQP_CONFIG_H
+
+#cmakedefine01 LQP_HAS_GUROBI
+
+#endif // LQP_CONFIG_H

@@ -44,6 +44,7 @@ namespace lqp {
   enum class SolverImplementation {
     Null,
     Glpk,
+    Gurobi,
   };
 
   std::unique_ptr<Solver> make_solver(SolverImplementation implementation);
