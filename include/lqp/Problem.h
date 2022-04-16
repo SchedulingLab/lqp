@@ -71,7 +71,6 @@ namespace lqp {
     std::vector<Constraint> m_constraints;
 
     Objective m_objective;
-
   };
 
 }

@@ -1,3 +1,6 @@
+#include <cassert>
+#include <cstdio>
+
 #include <lqp/Problem.h>
 #include <lqp/Solver.h>
 
@@ -21,7 +24,11 @@ int main() {
   config.problem_output = "problem.txt";
   config.solution_output = "solution.txt";
 
-  solver->solve(problem, config);
+  auto result = solver->solve(problem, config);
+  assert(result.has_solution());
+
+  auto solution = result.solution();
+  std::printf("x_1 = %g, x_2 = %g, x_3 = %g\n", solution.value(x_1), solution.value(x_2), solution.value(x_3));
 
   return 0;
 }

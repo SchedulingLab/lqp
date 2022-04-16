@@ -227,7 +227,16 @@ namespace lqp {
       }
 
       if (ret == 0) {
-        return to_solver_status(glp_mip_status(m_problem));
+        auto status = to_solver_status(glp_mip_status(m_problem));
+        Solution solution;
+
+        if (status == SolverStatus::Optimal || status == SolverStatus::Feasible) {
+          for (std::size_t col_index = 0; col_index < raw_variables.size(); ++col_index) {
+            solution.set_value(VariableId{col_index}, glp_mip_col_val(m_problem, static_cast<int>(col_index + 1)));
+          }
+        }
+
+        return SolverResult(status, std::move(solution));
       }
     } else {
       glp_smcp parameters;
@@ -244,7 +253,16 @@ namespace lqp {
       }
 
       if (ret == 0) {
-        return to_solver_status(glp_get_status(m_problem));
+        auto status = to_solver_status(glp_get_status(m_problem));
+        Solution solution;
+
+        if (status == SolverStatus::Optimal || status == SolverStatus::Feasible) {
+          for (std::size_t col_index = 0; col_index < raw_variables.size(); ++col_index) {
+            solution.set_value(VariableId{col_index},  glp_get_col_prim(m_problem, static_cast<int>(col_index + 1)));
+          }
+        }
+
+        return SolverResult(status, std::move(solution));
       }
     }
 

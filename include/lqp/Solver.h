@@ -48,7 +48,14 @@ namespace lqp {
 
   class LQP_API Solver {
   public:
+    Solver() = default;
     virtual ~Solver();
+
+    Solver(const Solver&) = delete;
+    Solver& operator=(const Solver&) = delete;
+
+    Solver(Solver&&) = default;
+    Solver& operator=(Solver&&) = default;
 
     virtual bool available() const = 0;
     virtual SolverResult solve(const Problem& problem, const SolverConfig& config = SolverConfig()) = 0;
