@@ -149,6 +149,12 @@ install(
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lqp"
 )
 
+install(
+  FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGLPK.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGurobi.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lqp/cmake"
+)
 
 # examples
 
