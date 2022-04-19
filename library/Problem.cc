@@ -129,7 +129,7 @@ namespace lqp {
           if (it != mapping.end()) {
             variable = it->second;
           } else {
-            auto variable = result.add_variable(VariableCategory::Binary);
+            variable = result.add_variable(VariableCategory::Binary);
             mapping.insert({ std::make_tuple(v0, v1), variable });
             result.add_constraint(variable >= v0 + v1 - 1);
             result.add_constraint(variable <= 0.5 * (v0 + v1));
@@ -154,7 +154,7 @@ namespace lqp {
           if (it != mapping.end()) {
             variable = it->second;
           } else {
-            auto variable = result.add_variable(VariableCategory::Continuous, range);
+            variable = result.add_variable(VariableCategory::Continuous, range);
             mapping.insert({ std::make_tuple(v0, v1), variable });
             result.add_constraint(variable <= range.upper * v0);
             result.add_constraint(variable <= v1);
@@ -170,7 +170,7 @@ namespace lqp {
       result.m_constraints.push_back({ expression, constraint.range, constraint.name });
     }
 
-    return std::nullopt;
+    return result;
   }
 
 
@@ -303,7 +303,17 @@ namespace lqp {
       std::printf("%g * %s", term.coefficient, variable_name(term.variable).c_str());
     }
 
-    // TODO: quadratic terms
+    auto quadratic_terms = expr.quadratic_terms();
+
+    for (auto & term : quadratic_terms) {
+      if (first) {
+        first = false;
+      } else {
+        std::fputs(" + ", stdout);
+      }
+
+      std::printf("%g * %s * %s", term.coefficient, variable_name(term.variables[0]).c_str(), variable_name(term.variables[1]).c_str());
+    }
 
   }
 
