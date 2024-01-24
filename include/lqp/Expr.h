@@ -53,6 +53,12 @@ namespace lqp {
     std::vector<ExprLinearTerm> m_linear_terms;
   };
 
+  inline LExpr operator-(const LExpr& lhs) {
+    LExpr expr(lhs);
+    expr *= -1.0;
+    return expr;
+  }
+
   inline
   LExpr operator+(const LExpr& lhs, const LExpr& rhs) {
     LExpr expr(lhs);
