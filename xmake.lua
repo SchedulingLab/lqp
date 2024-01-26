@@ -26,6 +26,7 @@ end
 
 target("lqp")
     set_kind("shared")
+    add_defines("LQP_BUILD")
     add_files("library/*.cc")
     add_files("library/solvers/*.cc")
     add_headerfiles("include/lqp/*.h")
