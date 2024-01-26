@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2023-2024 Julien Bernard
 #include <lqp/Solver.h>
 
 #include <cassert>
@@ -6,7 +8,7 @@
 #include "solvers/GlpkSolver.h"
 #include "solvers/GurobiSolver.h"
 
-#include "config.h"
+// #include "config.h"
 
 namespace lqp {
   /*

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2023-2024 Julien Bernard
 #ifndef LQP_GLPK_SOLVER_H
 #define LQP_GLPK_SOLVER_H
 

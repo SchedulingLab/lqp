@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2023-2024 Julien Bernard
 #ifndef LQP_PROBLEM_H
 #define LQP_PROBLEM_H
 

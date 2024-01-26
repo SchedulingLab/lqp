@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2023-2024 Julien Bernard
 #include "GurobiSolver.h"
 
 #if LQP_HAS_GUROBI
