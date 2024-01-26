@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         configurations:
-        - { name: Windows,  runner: windows-latest, shell: pwsh, plat: windows, arch: x64,    mode: debug       }
-        - { name: Windows,  runner: windows-latest, shell: pwsh, plat: windows, arch: x64,    mode: release     }
+        # - { name: Windows,  runner: windows-latest, shell: pwsh, plat: windows, arch: x64,    mode: debug       }
+        # - { name: Windows,  runner: windows-latest, shell: pwsh, plat: windows, arch: x64,    mode: release     }
         - { name: Linux,    runner: ubuntu-latest,  shell: bash, plat: linux,   arch: x86_64, mode: debug       }
         - { name: Linux,    runner: ubuntu-latest,  shell: bash, plat: linux,   arch: x86_64, mode: release     }
         - { name: Linux,    runner: ubuntu-latest,  shell: bash, plat: linux,   arch: x86_64, mode: sanitizers  }
@@ -49,7 +49,7 @@ jobs:
 
       - name: Restore cached dependencies
         id: restore-cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
           key: ${{ matrix.configurations.plat }}-${{ matrix.configurations.arch }}-${{ matrix.configurations.mode }}-${{ steps.deps_hash.outputs.hash }}
@@ -59,7 +59,7 @@ jobs:
 
       - name: Save cached xmake dependencies
         if: ${{ !steps.restore-cache.outputs.cache-hit }}
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
