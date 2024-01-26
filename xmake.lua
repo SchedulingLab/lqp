@@ -7,6 +7,13 @@ add_requires("glpk")
 
 add_rules("mode.debug", "mode.releasedbg", "mode.release")
 
+if is_mode("sanitizers") then
+    set_symbols("debug")
+    set_optimize("none")
+    set_policy("build.sanitizer.address", true)
+    set_policy("build.sanitizer.undefined", true)
+end
+
 set_policy("build.warning", true)
 set_warnings("allextra")
 set_languages("cxx17")
@@ -21,4 +28,6 @@ target("lqp")
     set_kind("shared")
     add_files("library/*.cc")
     add_files("library/solvers/*.cc")
+    add_headerfiles("include/lqp/*.h")
+    add_includedirs("include", { public = true })
     add_packages("glpk")
