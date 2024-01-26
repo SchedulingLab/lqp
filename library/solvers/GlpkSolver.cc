@@ -203,7 +203,7 @@ namespace lqp {
      * matrix
      */
 
-    assert(glp_check_dup(raw_constraints.size(), raw_variables.size(), coefficients.size() - 1, row_indices.data(), col_indices.data(), coefficients.data()) == 0);
+    assert(glp_check_dup(raw_constraints.size(), raw_variables.size(), coefficients.size() - 1, row_indices.data(), col_indices.data()) == 0);
     glp_load_matrix(m_problem, coefficients.size() - 1, row_indices.data(), col_indices.data(), coefficients.data());
 
     if (!config.problem_output.empty()) {

@@ -342,7 +342,7 @@ namespace lqp {
     std::map<std::tuple<VariableId, VariableId>, double> quadratic_terms;
 
     for (auto & term : m_quadratic_terms) {
-      assert(term.variables[0] <= term.variables[1]);
+      assert(to_index(term.variables[0]) <= to_index(term.variables[1]));
       quadratic_terms[std::make_tuple(term.variables[0], term.variables[1])] += term.coefficient;
     }
 
