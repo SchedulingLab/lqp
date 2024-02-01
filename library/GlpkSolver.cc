@@ -89,7 +89,7 @@ namespace lqp {
 
     auto raw_variables = variables(linear_problem);
 
-    glp_add_cols(prob, raw_variables.size());
+    glp_add_cols(prob, static_cast<int>(raw_variables.size()));
 
     std::size_t col_index = 0;
     int col = 1;
@@ -146,7 +146,7 @@ namespace lqp {
 
     auto raw_constraints = constraints(linear_problem);
 
-    glp_add_rows(prob, raw_constraints.size());
+    glp_add_rows(prob, static_cast<int>(raw_constraints.size()));
 
     std::size_t row_index = 0;
     int row = 1;
@@ -178,10 +178,10 @@ namespace lqp {
 
       for (auto & term : linear_terms) {
         assert(term.coefficient != 0.0);
-        int col = static_cast<int>(to_index(term.variable) + 1);
+        int variable_col = static_cast<int>(to_index(term.variable) + 1);
 
         row_indices.push_back(row);
-        col_indices.push_back(col);
+        col_indices.push_back(variable_col);
         coefficients.push_back(term.coefficient);
       }
 
@@ -193,8 +193,8 @@ namespace lqp {
      * matrix
      */
 
-    assert(glp_check_dup(raw_constraints.size(), raw_variables.size(), coefficients.size() - 1, row_indices.data(), col_indices.data()) == 0);
-    glp_load_matrix(prob, coefficients.size() - 1, row_indices.data(), col_indices.data(), coefficients.data());
+    assert(glp_check_dup(static_cast<int>(raw_constraints.size()), static_cast<int>(raw_variables.size()), static_cast<int>(coefficients.size() - 1), row_indices.data(), col_indices.data()) == 0);
+    glp_load_matrix(prob, static_cast<int>(coefficients.size() - 1), row_indices.data(), col_indices.data(), coefficients.data());
 
     if (!config.problem_output.empty()) {
       glp_write_lp(prob, nullptr, config.problem_output.string().c_str());
@@ -210,7 +210,7 @@ namespace lqp {
 
       parameters.msg_lev = config.verbose ? GLP_MSG_ALL : GLP_MSG_OFF;
       parameters.presolve = config.presolve ? GLP_ON : GLP_OFF;
-      parameters.tm_lim = (config.timeout != std::chrono::milliseconds::max()) ? config.timeout.count() : std::numeric_limits<int>::max();
+      parameters.tm_lim = (config.timeout != std::chrono::milliseconds::max()) ? static_cast<int>(config.timeout.count()) : std::numeric_limits<int>::max();
 
       int ret = glp_intopt(prob, &parameters);
 
@@ -223,8 +223,8 @@ namespace lqp {
         Solution solution(status);
 
         if (status == SolutionStatus::Optimal || status == SolutionStatus::Feasible) {
-          for (std::size_t col_index = 0; col_index < raw_variables.size(); ++col_index) {
-            solution.set_value(VariableId{col_index}, glp_mip_col_val(prob, static_cast<int>(col_index + 1)));
+          for (std::size_t variable_index = 0; variable_index < raw_variables.size(); ++variable_index) {
+            solution.set_value(VariableId{variable_index}, glp_mip_col_val(prob, static_cast<int>(variable_index + 1)));
           }
         }
 
@@ -236,7 +236,7 @@ namespace lqp {
 
       parameters.msg_lev = config.verbose ? GLP_MSG_ALL : GLP_MSG_OFF;
       parameters.presolve = config.presolve ? GLP_ON : GLP_OFF;
-      parameters.tm_lim = (config.timeout != std::chrono::milliseconds::max()) ? config.timeout.count() : std::numeric_limits<int>::max();
+      parameters.tm_lim = (config.timeout != std::chrono::milliseconds::max()) ? static_cast<int>(config.timeout.count()) : std::numeric_limits<int>::max();
 
       int ret = glp_simplex(prob, &parameters);
 
@@ -249,8 +249,8 @@ namespace lqp {
         Solution solution(status);
 
         if (status == SolutionStatus::Optimal || status == SolutionStatus::Feasible) {
-          for (std::size_t col_index = 0; col_index < raw_variables.size(); ++col_index) {
-            solution.set_value(VariableId{col_index},  glp_get_col_prim(prob, static_cast<int>(col_index + 1)));
+          for (std::size_t variable_index = 0; variable_index < raw_variables.size(); ++variable_index) {
+            solution.set_value(VariableId{variable_index},  glp_get_col_prim(prob, static_cast<int>(variable_index + 1)));
           }
         }
 
