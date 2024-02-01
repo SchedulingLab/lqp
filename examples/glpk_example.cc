@@ -26,7 +26,7 @@ int main() {
   config.solution_output = "solution.txt";
 
   auto solution = solver.solve(problem, config);
-  assert(result.status() == lqp::SolutionStatus::Optimal);
+  assert(solution.status() == lqp::SolutionStatus::Optimal);
 
   std::printf("x_1 = %g, x_2 = %g, x_3 = %g\n", solution.value(x_1), solution.value(x_2), solution.value(x_3));
 
