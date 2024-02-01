@@ -1,9 +1,7 @@
 set_project("lqp")
 set_version("0.1.0")
 
-add_repositories("sched-repo https://github.com/SchedulingLab/xmake-repo")
-
-add_requires("glpk", { configs = { shared = true }})
+add_requires("glpk")
 
 add_rules("mode.debug", "mode.releasedbg", "mode.release")
 
