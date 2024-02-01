@@ -1,71 +1,61 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023-2024 Julien Bernard
-#include "GlpkSolver.h"
+#include <lqp/GlpkSolver.h>
 
 #include <cassert>
 #include <cstdio>
+
 #include <limits>
+#include <memory>
+
+#include <glpk.h>
 
 namespace lqp {
   namespace {
     constexpr double Ignored = 0.0;
 
-    SolverStatus to_solver_status(int val) {
+    SolutionStatus to_solver_status(int val) {
       switch (val) {
         case GLP_OPT:
-          return SolverStatus::Optimal;
+          return SolutionStatus::Optimal;
         case GLP_FEAS:
-          return SolverStatus::Feasible;
+          return SolutionStatus::Feasible;
         case GLP_INFEAS:
-          return SolverStatus::Infeasible;
+          return SolutionStatus::Infeasible;
         case GLP_NOFEAS:
-          return SolverStatus::NoFeasibleSolution;
+          return SolutionStatus::NoFeasibleSolution;
         case GLP_UNBND:
-          return SolverStatus::UnboundedSolution;
+          return SolutionStatus::UnboundedSolution;
         case GLP_UNDEF:
-          return SolverStatus::Undefined;
+          return SolutionStatus::Undefined;
         default:
           break;
       }
 
-      return SolverStatus::Error;
+      return SolutionStatus::Error;
     }
 
-  }
-
-  GlpkSolver::GlpkSolver()
-  : m_problem(nullptr)
-  {
-  }
-
-  GlpkSolver::~GlpkSolver() {
-    if (m_problem != nullptr) {
-      glp_delete_prob(m_problem);
-    }
   }
 
   bool GlpkSolver::available() const {
     return true;
   }
 
-  SolverResult GlpkSolver::solve(const Problem& problem, const SolverConfig& config) {
+  Solution GlpkSolver::solve(const Problem& problem, const SolverConfig& config) {
     Problem linear_problem = problem;
 
     if (!linear_problem.is_linear()) {
       auto maybe_linear_problem = problem.linearize();
 
       if (!maybe_linear_problem) {
-        return SolverStatus::Error;
+        return { SolutionStatus::NotSolved };
       }
 
       linear_problem = *maybe_linear_problem;
     }
 
-    if (m_problem != nullptr) {
-      glp_erase_prob(m_problem);
-    } else {
-      m_problem = glp_create_prob();
-    }
+    std::unique_ptr<glp_prob, decltype(&glp_delete_prob)> unique_problem(glp_create_prob(), &glp_delete_prob);
+    glp_prob* prob = unique_problem.get();
 
     std::vector<int> row_indices;
     std::vector<int> col_indices;
@@ -82,14 +72,14 @@ namespace lqp {
 
     auto raw_objective = objective(linear_problem);
 
-    glp_set_obj_name(m_problem, raw_objective.name.c_str());
+    glp_set_obj_name(prob, raw_objective.name.c_str());
 
     switch (raw_objective.sense) {
       case Sense::Maximize:
-        glp_set_obj_dir(m_problem, GLP_MAX);
+        glp_set_obj_dir(prob, GLP_MAX);
         break;
       case Sense::Minimize:
-        glp_set_obj_dir(m_problem, GLP_MIN);
+        glp_set_obj_dir(prob, GLP_MIN);
         break;
     }
 
@@ -99,51 +89,51 @@ namespace lqp {
 
     auto raw_variables = variables(linear_problem);
 
-    glp_add_cols(m_problem, raw_variables.size());
+    glp_add_cols(prob, raw_variables.size());
 
     std::size_t col_index = 0;
     int col = 1;
 
     for (auto & variable : raw_variables) {
-      glp_set_col_name(m_problem, col, variable.name.c_str());
+      glp_set_col_name(prob, col, variable.name.c_str());
 
       switch (variable.category) {
         case VariableCategory::Continuous:
-          glp_set_col_kind(m_problem, col, GLP_CV);
+          glp_set_col_kind(prob, col, GLP_CV);
           break;
         case VariableCategory::Integer:
-          glp_set_col_kind(m_problem, col, GLP_IV);
+          glp_set_col_kind(prob, col, GLP_IV);
           break;
         case VariableCategory::Binary:
-          glp_set_col_kind(m_problem, col, GLP_BV);
+          glp_set_col_kind(prob, col, GLP_BV);
           assert(variable.range.type == VariableRange::Bounded);
           break;
       }
 
       switch (variable.range.type) {
         case VariableRange::Unbounded:
-          glp_set_col_bnds(m_problem, col, GLP_FR, Ignored, Ignored);
+          glp_set_col_bnds(prob, col, GLP_FR, Ignored, Ignored);
           break;
         case VariableRange::LowerBounded:
-          glp_set_col_bnds(m_problem, col, GLP_LO, variable.range.lower, Ignored);
+          glp_set_col_bnds(prob, col, GLP_LO, variable.range.lower, Ignored);
           break;
         case VariableRange::UpperBounded:
-          glp_set_col_bnds(m_problem, col, GLP_UP, Ignored, variable.range.upper);
+          glp_set_col_bnds(prob, col, GLP_UP, Ignored, variable.range.upper);
           break;
         case VariableRange::Bounded:
           if (variable.category != VariableCategory::Binary) {
-            glp_set_col_bnds(m_problem, col, GLP_DB, variable.range.lower, variable.range.upper);
+            glp_set_col_bnds(prob, col, GLP_DB, variable.range.lower, variable.range.upper);
           }
           break;
         case VariableRange::Fixed:
-          glp_set_col_bnds(m_problem, col, GLP_FX, variable.range.lower, variable.range.upper);
+          glp_set_col_bnds(prob, col, GLP_FX, variable.range.lower, variable.range.upper);
           break;
       }
 
       double coefficient = raw_objective.expression.linear_coefficient(VariableId{col_index});
 
       if (coefficient != 0.0) {
-        glp_set_obj_coef(m_problem, col, coefficient);
+        glp_set_obj_coef(prob, col, coefficient);
       }
 
       ++col_index;
@@ -156,31 +146,31 @@ namespace lqp {
 
     auto raw_constraints = constraints(linear_problem);
 
-    glp_add_rows(m_problem, raw_constraints.size());
+    glp_add_rows(prob, raw_constraints.size());
 
     std::size_t row_index = 0;
     int row = 1;
 
     for (auto & constraint : raw_constraints) {
-      glp_set_row_name(m_problem, row, constraint.name.c_str());
+      glp_set_row_name(prob, row, constraint.name.c_str());
 
       double constant = constraint.expression.constant();
 
       switch (constraint.range.type) {
         case VariableRange::Unbounded:
-          glp_set_row_bnds(m_problem, row, GLP_FR, Ignored, Ignored);
+          glp_set_row_bnds(prob, row, GLP_FR, Ignored, Ignored);
           break;
         case VariableRange::LowerBounded:
-          glp_set_row_bnds(m_problem, row, GLP_LO, constraint.range.lower - constant, Ignored);
+          glp_set_row_bnds(prob, row, GLP_LO, constraint.range.lower - constant, Ignored);
           break;
         case VariableRange::UpperBounded:
-          glp_set_row_bnds(m_problem, row, GLP_UP, Ignored, constraint.range.upper - constant);
+          glp_set_row_bnds(prob, row, GLP_UP, Ignored, constraint.range.upper - constant);
           break;
         case VariableRange::Bounded:
-          glp_set_row_bnds(m_problem, row, GLP_DB, constraint.range.lower - constant, constraint.range.upper - constant);
+          glp_set_row_bnds(prob, row, GLP_DB, constraint.range.lower - constant, constraint.range.upper - constant);
           break;
         case VariableRange::Fixed:
-          glp_set_row_bnds(m_problem, row, GLP_FX, constraint.range.lower - constant, constraint.range.upper - constant);
+          glp_set_row_bnds(prob, row, GLP_FX, constraint.range.lower - constant, constraint.range.upper - constant);
           break;
       }
 
@@ -204,10 +194,10 @@ namespace lqp {
      */
 
     assert(glp_check_dup(raw_constraints.size(), raw_variables.size(), coefficients.size() - 1, row_indices.data(), col_indices.data()) == 0);
-    glp_load_matrix(m_problem, coefficients.size() - 1, row_indices.data(), col_indices.data(), coefficients.data());
+    glp_load_matrix(prob, coefficients.size() - 1, row_indices.data(), col_indices.data(), coefficients.data());
 
     if (!config.problem_output.empty()) {
-      glp_write_lp(m_problem, nullptr, config.problem_output.string().c_str());
+      glp_write_lp(prob, nullptr, config.problem_output.string().c_str());
     }
 
     /*
@@ -222,23 +212,23 @@ namespace lqp {
       parameters.presolve = config.presolve ? GLP_ON : GLP_OFF;
       parameters.tm_lim = (config.timeout != std::chrono::milliseconds::max()) ? config.timeout.count() : std::numeric_limits<int>::max();
 
-      int ret = glp_intopt(m_problem, &parameters);
+      int ret = glp_intopt(prob, &parameters);
 
       if (!config.solution_output.empty()) {
-        glp_print_mip(m_problem, config.solution_output.string().c_str());
+        glp_print_mip(prob, config.solution_output.string().c_str());
       }
 
       if (ret == 0) {
-        auto status = to_solver_status(glp_mip_status(m_problem));
-        Solution solution;
+        auto status = to_solver_status(glp_mip_status(prob));
+        Solution solution(status);
 
-        if (status == SolverStatus::Optimal || status == SolverStatus::Feasible) {
+        if (status == SolutionStatus::Optimal || status == SolutionStatus::Feasible) {
           for (std::size_t col_index = 0; col_index < raw_variables.size(); ++col_index) {
-            solution.set_value(VariableId{col_index}, glp_mip_col_val(m_problem, static_cast<int>(col_index + 1)));
+            solution.set_value(VariableId{col_index}, glp_mip_col_val(prob, static_cast<int>(col_index + 1)));
           }
         }
 
-        return SolverResult(status, std::move(solution));
+        return solution;
       }
     } else {
       glp_smcp parameters;
@@ -248,27 +238,27 @@ namespace lqp {
       parameters.presolve = config.presolve ? GLP_ON : GLP_OFF;
       parameters.tm_lim = (config.timeout != std::chrono::milliseconds::max()) ? config.timeout.count() : std::numeric_limits<int>::max();
 
-      int ret = glp_simplex(m_problem, &parameters);
+      int ret = glp_simplex(prob, &parameters);
 
       if (!config.solution_output.empty()) {
-        glp_print_sol(m_problem, config.solution_output.string().c_str());
+        glp_print_sol(prob, config.solution_output.string().c_str());
       }
 
       if (ret == 0) {
-        auto status = to_solver_status(glp_get_status(m_problem));
-        Solution solution;
+        auto status = to_solver_status(glp_get_status(prob));
+        Solution solution(status);
 
-        if (status == SolverStatus::Optimal || status == SolverStatus::Feasible) {
+        if (status == SolutionStatus::Optimal || status == SolutionStatus::Feasible) {
           for (std::size_t col_index = 0; col_index < raw_variables.size(); ++col_index) {
-            solution.set_value(VariableId{col_index},  glp_get_col_prim(m_problem, static_cast<int>(col_index + 1)));
+            solution.set_value(VariableId{col_index},  glp_get_col_prim(prob, static_cast<int>(col_index + 1)));
           }
         }
 
-        return SolverResult(status, std::move(solution));
+        return solution;
       }
     }
 
-    return SolverStatus::Error;
+    return { SolutionStatus::Error };
   }
 
 }

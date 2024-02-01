@@ -4,6 +4,16 @@
 
 
 namespace lqp {
+  Solution::Solution(SolutionStatus status)
+  : m_status(status)
+  {
+  }
+
+  SolutionStatus Solution::status() const
+  {
+    return m_status;
+  }
+
   bool Solution::empty() const {
     return m_values.empty();
   }

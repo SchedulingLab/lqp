@@ -1,8 +1,9 @@
 #include <cassert>
 #include <cstdio>
 
+#include <lqp/GlpkSolver.h>
 #include <lqp/Problem.h>
-#include <lqp/Solver.h>
+#include <lqp/Solution.h>
 
 int main() {
   lqp::Problem problem;
@@ -18,16 +19,15 @@ int main() {
   problem.set_objective(lqp::Sense::Maximize, 10 * x_1 + 6 * x_2 + 4 * x_3, "z");
   problem.print();
 
-  auto solver = lqp::make_solver(lqp::SolverImplementation::Glpk);
+  lqp::GlpkSolver solver;
 
   lqp::SolverConfig config;
   config.problem_output = "problem.txt";
   config.solution_output = "solution.txt";
 
-  auto result = solver->solve(problem, config);
-  assert(result.has_solution());
+  auto solution = solver.solve(problem, config);
+  assert(result.status() == lqp::SolutionStatus::Optimal);
 
-  auto solution = result.solution();
   std::printf("x_1 = %g, x_2 = %g, x_3 = %g\n", solution.value(x_1), solution.value(x_2), solution.value(x_3));
 
   return 0;

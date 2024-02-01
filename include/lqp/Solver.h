@@ -3,7 +3,6 @@
 #ifndef LQP_SOLVER_H
 #define LQP_SOLVER_H
 
-#include <memory>
 #include <chrono>
 #include <filesystem>
 
@@ -12,32 +11,6 @@
 #include "Solution.h"
 
 namespace lqp {
-
-  enum class SolverStatus {
-    Error,
-    Optimal,
-    Feasible,
-    Infeasible,
-    NoFeasibleSolution,
-    UnboundedSolution,
-    Undefined,
-    NotSolved,
-  };
-
-  class LQP_API SolverResult {
-  public:
-    SolverResult(SolverStatus status);
-    SolverResult(SolverStatus status, Solution solution);
-
-    SolverStatus status() const;
-
-    bool has_solution() const;
-    Solution solution();
-
-  private:
-    SolverStatus m_status;
-    Solution m_solution;
-  };
 
   struct LQP_API SolverConfig {
     bool use_mip = false;
@@ -60,7 +33,7 @@ namespace lqp {
     Solver& operator=(Solver&&) = default;
 
     virtual bool available() const = 0;
-    virtual SolverResult solve(const Problem& problem, const SolverConfig& config = SolverConfig()) = 0;
+    virtual Solution solve(const Problem& problem, const SolverConfig& config = SolverConfig()) = 0;
 
   protected:
     static std::vector<Problem::Variable> variables(const Problem& problem);
@@ -68,21 +41,12 @@ namespace lqp {
     static Problem::Objective objective(const Problem& problem);
   };
 
-  enum class SolverImplementation {
-    Null,
-    Glpk,
-    Gurobi,
-  };
-
-  LQP_API std::unique_ptr<Solver> make_solver(SolverImplementation implementation);
-
   class LQP_API NullSolver : public Solver {
   public:
     bool available() const override;
-    SolverResult solve(const Problem& problem, const SolverConfig& config) override;
+    Solution solve(const Problem& problem, const SolverConfig& config) override;
   };
 
 }
-
 
 #endif // LQP_SOLVER_H

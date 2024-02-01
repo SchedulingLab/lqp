@@ -5,39 +5,9 @@
 #include <cassert>
 #include <cstdio>
 
-#include "solvers/GlpkSolver.h"
-#include "solvers/GurobiSolver.h"
-
 // #include "config.h"
 
 namespace lqp {
-  /*
-   * SolverResult
-   */
-
-  SolverResult::SolverResult(SolverStatus status)
-  : m_status(status)
-  {
-  }
-
-  SolverResult::SolverResult(SolverStatus status, Solution solution)
-  : m_status(status)
-  , m_solution(std::move(solution))
-  {
-  }
-
-  SolverStatus SolverResult::status() const {
-    return m_status;
-  }
-
-  bool SolverResult::has_solution() const {
-    return !m_solution.empty();
-  }
-
-  Solution SolverResult::solution() {
-    return m_solution;
-  }
-
   /*
    * Solver
    */
@@ -56,26 +26,12 @@ namespace lqp {
     return problem.m_objective;
   }
 
-
-  std::unique_ptr<Solver> make_solver(SolverImplementation implementation) {
-    switch (implementation) {
-      case SolverImplementation::Null:
-        return std::make_unique<NullSolver>();
-      case SolverImplementation::Glpk:
-        return std::make_unique<GlpkSolver>();
-      case SolverImplementation::Gurobi:
-        return std::make_unique<GurobiSolver>();
-    }
-
-    return std::make_unique<NullSolver>();
-  }
-
   bool NullSolver::available() const {
     return false;
   }
 
-  SolverResult NullSolver::solve([[maybe_unused]] const Problem& problem, [[maybe_unused]] const SolverConfig& config) {
-    return SolverStatus::NotSolved;
+  Solution NullSolver::solve([[maybe_unused]] const Problem& problem, [[maybe_unused]] const SolverConfig& config) {
+    return { SolutionStatus::NotSolved };
   }
 
 }

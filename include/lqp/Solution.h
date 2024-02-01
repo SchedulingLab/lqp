@@ -10,8 +10,23 @@
 
 namespace lqp {
 
+  enum class SolutionStatus {
+    Error,
+    Optimal,
+    Feasible,
+    Infeasible,
+    NoFeasibleSolution,
+    UnboundedSolution,
+    Undefined,
+    NotSolved,
+  };
+
   class LQP_API Solution {
   public:
+    Solution(SolutionStatus status);
+
+    SolutionStatus status() const;
+
     bool empty() const;
     void clear();
 
@@ -19,6 +34,7 @@ namespace lqp {
     double value(VariableId variable) const;
 
   private:
+    SolutionStatus m_status = SolutionStatus::NotSolved;
     std::map<VariableId, double> m_values;
   };
 
