@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0
 // Copyright (c) 2023-2024 Julien Bernard
 #include <lqp/GlpkSolver.h>
 

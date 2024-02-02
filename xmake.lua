@@ -31,7 +31,7 @@ target("lqp")
     add_headerfiles("include/(lqp/*.h)")
     add_includedirs("include", { public = true })
     add_packages("glpk")
-    set_license("MIT")
+    set_license("GPL-3.0")
 
 if has_config("examples") then
 

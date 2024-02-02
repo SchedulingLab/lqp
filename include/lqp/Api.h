@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0
 // Copyright (c) 2023-2024 Julien Bernard
 #ifndef LQP_API_H
 #define LQP_API_H

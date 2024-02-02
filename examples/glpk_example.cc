@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+// Copyright (c) 2023-2024 Julien Bernard
 #include <cassert>
 #include <cstdio>
 
