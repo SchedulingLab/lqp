@@ -6,6 +6,7 @@ add_requires("glpk")
 option("examples", { description = "Build examples", default = true })
 
 add_rules("mode.debug", "mode.releasedbg", "mode.release")
+add_rules("plugin.compile_commands.autoupdate", {outputdir = "$(buildir)"})
 
 if is_mode("sanitizers") then
     set_symbols("debug")
