@@ -41,7 +41,7 @@ namespace lqp {
   }
 
   double LExpr::linear_coefficient(VariableId variable) const {
-    for (auto & term : m_linear_terms) {
+    for (const auto& term : m_linear_terms) {
       if (term.variable == variable) {
         return term.coefficient;
       }
@@ -111,7 +111,7 @@ namespace lqp {
   double LExpr::evaluate(const Solution& solution) const {
     double value = m_constant;
 
-    for (auto& term : m_linear_terms) {
+    for (const auto& term : m_linear_terms) {
       value += term.coefficient * solution.value(term.variable);
     }
 
@@ -172,19 +172,19 @@ namespace lqp {
   : m_constant(expr1.m_constant * expr2.m_constant)
   {
     if (expr1.m_constant != 0.0 && !expr2.m_linear_terms.empty()) {
-      for (auto & term : expr2.m_linear_terms) {
+      for (const auto& term : expr2.m_linear_terms) {
         m_linear_terms.push_back({ expr1.m_constant * term.coefficient, term.variable });
       }
     }
 
     if (expr2.m_constant != 0.0 && !expr1.m_linear_terms.empty()) {
-      for (auto & term : expr1.m_linear_terms) {
+      for (const auto& term : expr1.m_linear_terms) {
         m_linear_terms.push_back({ expr2.m_constant * term.coefficient, term.variable });
       }
     }
 
-    for (auto & term1 : expr1.m_linear_terms) {
-      for (auto & term2 : expr2.m_linear_terms) {
+    for (const auto& term1 : expr1.m_linear_terms) {
+      for (const auto& term2 : expr2.m_linear_terms) {
         ExprQuadraticTerm result = { term1.coefficient * term2.coefficient, { term1.variable, term2.variable } };
 
         if (result.variables[0] < result.variables[1]) {
@@ -211,7 +211,7 @@ namespace lqp {
   }
 
   double QExpr::linear_coefficient(VariableId variable) const {
-    for (auto & term : m_linear_terms) {
+    for (const auto& term : m_linear_terms) {
       if (term.variable == variable) {
         return term.coefficient;
       }
@@ -225,7 +225,7 @@ namespace lqp {
       std::swap(variable1, variable2);
     }
 
-    for (auto & term : m_quadratic_terms) {
+    for (const auto& term : m_quadratic_terms) {
       if (term.variables[0] == variable1 && term.variables[1] == variable2) {
         return term.coefficient;
       }
@@ -313,11 +313,11 @@ namespace lqp {
   double QExpr::evaluate(const Solution& solution) const {
     double value = m_constant;
 
-    for (auto& term : m_linear_terms) {
+    for (const auto& term : m_linear_terms) {
       value += term.coefficient * solution.value(term.variable);
     }
 
-    for (auto& term : m_quadratic_terms) {
+    for (const auto& term : m_quadratic_terms) {
       value += term.coefficient * solution.value(term.variables[0]) * solution.value(term.variables[1]);
     }
 

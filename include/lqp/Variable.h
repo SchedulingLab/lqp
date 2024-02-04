@@ -4,6 +4,7 @@
 #define LQP_VARIABLE_H
 
 #include <cstddef>
+#include <cstdint>
 
 #include "Api.h"
 
@@ -34,14 +35,14 @@ namespace lqp {
   }
 
 
-  enum class VariableCategory {
+  enum class VariableCategory : uint8_t {
     Continuous,
     Integer,
     Binary,
   };
 
   struct LQP_API VariableRange {
-    enum Type {
+    enum Type : uint8_t {
       Unbounded,
       LowerBounded,
       UpperBounded,
@@ -49,9 +50,9 @@ namespace lqp {
       Fixed,
     };
 
-    Type type;
-    double lower;
-    double upper;
+    Type type = Type::Unbounded;
+    double lower = 0.0;
+    double upper = 0.0;
 
     bool has_value(double value) const;
   };

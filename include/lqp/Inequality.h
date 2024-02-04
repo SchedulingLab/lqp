@@ -3,12 +3,14 @@
 #ifndef LQP_INEQUALITY_H
 #define LQP_INEQUALITY_H
 
+#include <cstdint>
+
 #include "Api.h"
 #include "Expr.h"
 
 namespace lqp {
 
-  enum class Operator {
+  enum class Operator : uint8_t {
     GreaterEqual,
     Equal,
     LessEqual,
@@ -16,7 +18,7 @@ namespace lqp {
 
   struct LQP_API Inequality {
     QExpr expression;
-    Operator op;
+    Operator op = Operator::Equal;
   };
 
   LQP_API Inequality operator<=(const QExpr& lhs, const QExpr& rhs);

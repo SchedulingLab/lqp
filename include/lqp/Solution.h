@@ -3,6 +3,8 @@
 #ifndef LQP_SOLUTION_H
 #define LQP_SOLUTION_H
 
+#include <cstdint>
+
 #include <map>
 
 #include "Api.h"
@@ -10,7 +12,7 @@
 
 namespace lqp {
 
-  enum class SolutionStatus {
+  enum class SolutionStatus : uint8_t {
     Error,
     Optimal,
     Feasible,

@@ -3,6 +3,8 @@
 #include <cassert>
 #include <cstdio>
 
+#include <iostream>
+
 #include <lqp/GlpkSolver.h>
 #include <lqp/Problem.h>
 #include <lqp/Solution.h>
@@ -19,7 +21,7 @@ int main() {
   problem.add_constraint(2 * x_1 + 2 * x_2 + 6 * x_3 <= 300.0, "r");
 
   problem.set_objective(lqp::Sense::Maximize, 10 * x_1 + 6 * x_2 + 4 * x_3, "z");
-  problem.print();
+  problem.print_to(std::cout);
 
   lqp::GlpkSolver solver;
 

@@ -48,7 +48,6 @@ namespace lqp {
   private:
     void normalize();
 
-  private:
     friend class QExpr;
 
     double m_constant;
@@ -128,12 +127,12 @@ namespace lqp {
 
   inline
   LExpr operator*(double lhs, VariableId rhs) {
-    return LExpr(lhs, rhs);
+    return { lhs, rhs };
   }
 
   inline
   LExpr operator*(VariableId lhs, double rhs) {
-    return LExpr(rhs, lhs);
+    return { rhs, lhs };
   }
 
 
@@ -168,7 +167,6 @@ namespace lqp {
   private:
     void normalize();
 
-  private:
     double m_constant;
     std::vector<ExprLinearTerm> m_linear_terms;
     std::vector<ExprQuadraticTerm> m_quadratic_terms;
@@ -212,22 +210,22 @@ namespace lqp {
 
   inline
   QExpr operator*(VariableId lhs, VariableId rhs) {
-    return QExpr(lhs, rhs);
+    return { lhs, rhs };
   }
 
   inline
   QExpr operator*(VariableId lhs, const LExpr& rhs) {
-    return QExpr(LExpr(lhs), rhs);
+    return { LExpr(lhs), rhs };
   }
 
   inline
   QExpr operator*(const LExpr& lhs, VariableId rhs) {
-    return QExpr(lhs, LExpr(rhs));
+    return { lhs, LExpr(rhs) };
   }
 
   inline
   QExpr operator*(const LExpr& lhs, const LExpr& rhs) {
-    return QExpr(lhs, rhs);
+    return { lhs, rhs };
   }
 
 }

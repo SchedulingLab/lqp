@@ -3,6 +3,8 @@
 #ifndef LQP_PROBLEM_H
 #define LQP_PROBLEM_H
 
+#include <cstdint>
+
 #include <iosfwd>
 #include <optional>
 #include <string>
@@ -21,7 +23,7 @@ namespace lqp {
     std::size_t index;
   };
 
-  enum class Sense {
+  enum class Sense : uint8_t {
     Minimize,
     Maximize,
   };
@@ -43,12 +45,11 @@ namespace lqp {
     bool is_feasible(const Solution& solution) const;
     double compute_objective_value(const Solution& solution) const;
 
-    void print() const;
+    void print_to(std::ostream& out) const;
 
   private:
-    void print_expr(const QExpr& expr) const;
+    void print_expr_to(const QExpr& expr, std::ostream& out) const;
 
-  private:
     friend class Solver;
 
     struct Variable {
@@ -69,11 +70,19 @@ namespace lqp {
       std::string name;
     };
 
+    bool linearize_constraint(const Constraint& constraint, Problem& result) const;
+
     std::vector<Variable> m_variables;
     std::vector<Constraint> m_constraints;
 
     Objective m_objective;
   };
+
+  inline std::ostream& operator<<(std::ostream& out, const Problem& problem)
+  {
+    problem.print_to(out);
+    return out;
+  }
 
 }
 
