@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 // Copyright (c) 2023-2024 Julien Bernard
+
+// clang-format off: main header
 #include <lqp/Expr.h>
+// clang-format on
 
 #include <cassert>
+
 #include <map>
 #include <tuple>
 
@@ -32,15 +36,18 @@ namespace lqp {
     m_linear_terms.push_back({ coefficient, variable });
   }
 
-  bool LExpr::is_constant() const {
+  bool LExpr::is_constant() const
+  {
     return m_linear_terms.empty();
   }
 
-  double LExpr::constant() const {
+  double LExpr::constant() const
+  {
     return m_constant;
   }
 
-  double LExpr::linear_coefficient(VariableId variable) const {
+  double LExpr::linear_coefficient(VariableId variable) const
+  {
     for (const auto& term : m_linear_terms) {
       if (term.variable == variable) {
         return term.coefficient;
@@ -50,11 +57,13 @@ namespace lqp {
     return 0.0;
   }
 
-  std::vector<ExprLinearTerm> LExpr::linear_terms() const {
+  std::vector<ExprLinearTerm> LExpr::linear_terms() const
+  {
     return m_linear_terms;
   }
 
-  LExpr& LExpr::operator+=(const LExpr& other) {
+  LExpr& LExpr::operator+=(const LExpr& other)
+  {
     if (&other == this) {
       operator*=(2.0);
       return *this;
@@ -70,7 +79,8 @@ namespace lqp {
     return *this;
   }
 
-  LExpr& LExpr::operator-=(const LExpr& other) {
+  LExpr& LExpr::operator-=(const LExpr& other)
+  {
     if (&other == this) {
       m_constant = 0.0;
       m_linear_terms.clear();
@@ -82,7 +92,8 @@ namespace lqp {
     return operator+=(expr);
   }
 
-  LExpr& LExpr::operator*=(double factor) {
+  LExpr& LExpr::operator*=(double factor)
+  {
     if (factor == 0.0) {
       m_constant = 0.0;
       m_linear_terms.clear();
@@ -91,14 +102,15 @@ namespace lqp {
 
     m_constant *= factor;
 
-    for (auto & term : m_linear_terms) {
+    for (auto& term : m_linear_terms) {
       term.coefficient *= factor;
     }
 
     return *this;
   }
 
-  LExpr& LExpr::operator/=(double factor) {
+  LExpr& LExpr::operator/=(double factor)
+  {
     m_constant /= factor;
 
     for (auto& term : m_linear_terms) {
@@ -108,7 +120,8 @@ namespace lqp {
     return *this;
   }
 
-  double LExpr::evaluate(const Solution& solution) const {
+  double LExpr::evaluate(const Solution& solution) const
+  {
     double value = m_constant;
 
     for (const auto& term : m_linear_terms) {
@@ -118,23 +131,22 @@ namespace lqp {
     return value;
   }
 
-  void LExpr::normalize() {
+  void LExpr::normalize()
+  {
     std::map<VariableId, double> linear_terms;
 
-    for (auto & term : m_linear_terms) {
+    for (auto& term : m_linear_terms) {
       linear_terms[term.variable] += term.coefficient;
     }
 
     m_linear_terms.clear();
 
-    for (auto [ variable, coefficient ] : linear_terms) {
+    for (auto [variable, coefficient] : linear_terms) {
       if (coefficient != 0.0) {
         m_linear_terms.push_back({ coefficient, variable });
       }
     }
   }
-
-
 
   QExpr::QExpr()
   : m_constant(0.0)
@@ -165,7 +177,9 @@ namespace lqp {
       std::swap(variable1, variable2);
     }
 
-    m_quadratic_terms.push_back({ 1.0, { variable1, variable2 } });
+    m_quadratic_terms.push_back({
+        1.0, { variable1, variable2 }
+    });
   }
 
   QExpr::QExpr(const LExpr& expr1, const LExpr& expr2)
@@ -185,7 +199,9 @@ namespace lqp {
 
     for (const auto& term1 : expr1.m_linear_terms) {
       for (const auto& term2 : expr2.m_linear_terms) {
-        ExprQuadraticTerm result = { term1.coefficient * term2.coefficient, { term1.variable, term2.variable } };
+        ExprQuadraticTerm result = {
+          term1.coefficient * term2.coefficient, { term1.variable, term2.variable }
+        };
 
         if (result.variables[0] < result.variables[1]) {
           std::swap(result.variables[0], result.variables[1]);
@@ -198,19 +214,23 @@ namespace lqp {
     normalize();
   }
 
-  bool QExpr::is_constant() const {
+  bool QExpr::is_constant() const
+  {
     return m_linear_terms.empty() && m_quadratic_terms.empty();
   }
 
-  bool QExpr::is_linear() const {
+  bool QExpr::is_linear() const
+  {
     return m_quadratic_terms.empty();
   }
 
-  double QExpr::constant() const {
+  double QExpr::constant() const
+  {
     return m_constant;
   }
 
-  double QExpr::linear_coefficient(VariableId variable) const {
+  double QExpr::linear_coefficient(VariableId variable) const
+  {
     for (const auto& term : m_linear_terms) {
       if (term.variable == variable) {
         return term.coefficient;
@@ -220,7 +240,8 @@ namespace lqp {
     return 0.0;
   }
 
-  double QExpr::quadratic_coefficient(VariableId variable1, VariableId variable2) const {
+  double QExpr::quadratic_coefficient(VariableId variable1, VariableId variable2) const
+  {
     if (variable1 > variable2) {
       std::swap(variable1, variable2);
     }
@@ -234,15 +255,18 @@ namespace lqp {
     return 0.0;
   }
 
-  std::vector<ExprLinearTerm> QExpr::linear_terms() const {
+  std::vector<ExprLinearTerm> QExpr::linear_terms() const
+  {
     return m_linear_terms;
   }
 
-  std::vector<ExprQuadraticTerm> QExpr::quadratic_terms() const {
+  std::vector<ExprQuadraticTerm> QExpr::quadratic_terms() const
+  {
     return m_quadratic_terms;
   }
 
-  QExpr& QExpr::operator+=(const QExpr& other) {
+  QExpr& QExpr::operator+=(const QExpr& other)
+  {
     if (&other == this) {
       operator*=(2.0);
       return *this;
@@ -262,7 +286,8 @@ namespace lqp {
     return *this;
   }
 
-  QExpr& QExpr::operator-=(const QExpr& other) {
+  QExpr& QExpr::operator-=(const QExpr& other)
+  {
     if (&other == this) {
       m_constant = 0.0;
       m_linear_terms.clear();
@@ -275,7 +300,8 @@ namespace lqp {
     return operator+=(expr);
   }
 
-  QExpr& QExpr::operator*=(double factor) {
+  QExpr& QExpr::operator*=(double factor)
+  {
     if (factor == 0.0) {
       m_constant = 0.0;
       m_linear_terms.clear();
@@ -285,18 +311,19 @@ namespace lqp {
 
     m_constant *= factor;
 
-    for (auto & term : m_linear_terms) {
+    for (auto& term : m_linear_terms) {
       term.coefficient *= factor;
     }
 
-    for (auto & term : m_quadratic_terms) {
+    for (auto& term : m_quadratic_terms) {
       term.coefficient *= factor;
     }
 
     return *this;
   }
 
-  QExpr& QExpr::operator/=(double factor) {
+  QExpr& QExpr::operator/=(double factor)
+  {
     m_constant /= factor;
 
     for (auto& term : m_linear_terms) {
@@ -310,7 +337,8 @@ namespace lqp {
     return *this;
   }
 
-  double QExpr::evaluate(const Solution& solution) const {
+  double QExpr::evaluate(const Solution& solution) const
+  {
     double value = m_constant;
 
     for (const auto& term : m_linear_terms) {
@@ -324,16 +352,17 @@ namespace lqp {
     return value;
   }
 
-  void QExpr::normalize() {
+  void QExpr::normalize()
+  {
     std::map<VariableId, double> linear_terms;
 
-    for (auto & term : m_linear_terms) {
+    for (auto& term : m_linear_terms) {
       linear_terms[term.variable] += term.coefficient;
     }
 
     m_linear_terms.clear();
 
-    for (auto [ variable, coefficient ] : linear_terms) {
+    for (auto [variable, coefficient] : linear_terms) {
       if (coefficient != 0.0) {
         m_linear_terms.push_back({ coefficient, variable });
       }
@@ -341,16 +370,18 @@ namespace lqp {
 
     std::map<std::tuple<VariableId, VariableId>, double> quadratic_terms;
 
-    for (auto & term : m_quadratic_terms) {
+    for (auto& term : m_quadratic_terms) {
       assert(to_index(term.variables[0]) <= to_index(term.variables[1]));
       quadratic_terms[std::make_tuple(term.variables[0], term.variables[1])] += term.coefficient;
     }
 
     m_quadratic_terms.clear();
 
-    for (auto [ variables, coefficient ] : quadratic_terms) {
+    for (auto [variables, coefficient] : quadratic_terms) {
       if (coefficient != 0.0) {
-        m_quadratic_terms.push_back({ coefficient, { std::get<0>(variables), std::get<1>(variables) } });
+        m_quadratic_terms.push_back({
+            coefficient, { std::get<0>(variables), std::get<1>(variables) }
+        });
       }
     }
   }

@@ -14,26 +14,25 @@ namespace lqp {
     std::size_t index;
   };
 
-  constexpr
-  bool operator==(VariableId lhs, VariableId rhs) {
+  constexpr bool operator==(VariableId lhs, VariableId rhs)
+  {
     return lhs.index == rhs.index;
   }
 
-  constexpr
-  bool operator<(VariableId lhs, VariableId rhs) {
+  constexpr bool operator<(VariableId lhs, VariableId rhs)
+  {
     return lhs.index < rhs.index;
   }
 
-  constexpr
-  bool operator>(VariableId lhs, VariableId rhs) {
+  constexpr bool operator>(VariableId lhs, VariableId rhs)
+  {
     return lhs.index > rhs.index;
   }
 
-  constexpr
-  std::size_t to_index(VariableId variable) {
+  constexpr std::size_t to_index(VariableId variable)
+  {
     return variable.index;
   }
-
 
   enum class VariableCategory : uint8_t {
     Continuous,

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 // Copyright (c) 2023-2024 Julien Bernard
-#include <lqp/Solution.h>
 
+// clang-format off: main header
+#include <lqp/Solution.h>
+// clang-format on
 
 namespace lqp {
   Solution::Solution(SolutionStatus status)
@@ -14,19 +16,23 @@ namespace lqp {
     return m_status;
   }
 
-  bool Solution::empty() const {
+  bool Solution::empty() const
+  {
     return m_values.empty();
   }
 
-  void Solution::clear() {
+  void Solution::clear()
+  {
     m_values.clear();
   }
 
-  void Solution::set_value(VariableId variable, double value) {
+  void Solution::set_value(VariableId variable, double value)
+  {
     m_values[variable] = value;
   }
 
-  double Solution::value(VariableId variable) const {
+  double Solution::value(VariableId variable) const
+  {
     auto it = m_values.find(variable);
 
     if (it != m_values.end()) {
@@ -36,6 +42,4 @@ namespace lqp {
     return 0.0;
   }
 
-
 }
-

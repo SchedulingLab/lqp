@@ -54,87 +54,87 @@ namespace lqp {
     std::vector<ExprLinearTerm> m_linear_terms;
   };
 
-  inline LExpr operator-(const LExpr& lhs) {
+  inline LExpr operator-(const LExpr& lhs)
+  {
     LExpr expr(lhs);
     expr *= -1.0;
     return expr;
   }
 
-  inline
-  LExpr operator+(const LExpr& lhs, const LExpr& rhs) {
+  inline LExpr operator+(const LExpr& lhs, const LExpr& rhs)
+  {
     LExpr expr(lhs);
     expr += rhs;
     return expr;
   }
 
-  inline
-  LExpr operator+(VariableId rhs, VariableId lhs) {
+  inline LExpr operator+(VariableId rhs, VariableId lhs)
+  {
     return LExpr(rhs) + LExpr(lhs);
   }
 
-  inline
-  LExpr operator+(double rhs, const LExpr& lhs) {
+  inline LExpr operator+(double rhs, const LExpr& lhs)
+  {
     return LExpr(rhs) + lhs;
   }
 
-  inline
-  LExpr operator+(const LExpr& rhs, double lhs) {
+  inline LExpr operator+(const LExpr& rhs, double lhs)
+  {
     return rhs + LExpr(lhs);
   }
 
-  inline
-  LExpr operator-(const LExpr& lhs, const LExpr& rhs) {
+  inline LExpr operator-(const LExpr& lhs, const LExpr& rhs)
+  {
     LExpr expr(lhs);
     expr -= rhs;
     return expr;
   }
 
-  inline
-  LExpr operator-(VariableId rhs, VariableId lhs) {
+  inline LExpr operator-(VariableId rhs, VariableId lhs)
+  {
     return LExpr(rhs) - LExpr(lhs);
   }
 
-  inline
-  LExpr operator-(double rhs, const LExpr& lhs) {
+  inline LExpr operator-(double rhs, const LExpr& lhs)
+  {
     return LExpr(rhs) - lhs;
   }
 
-  inline
-  LExpr operator-(const LExpr& rhs, double lhs) {
+  inline LExpr operator-(const LExpr& rhs, double lhs)
+  {
     return rhs - LExpr(lhs);
   }
 
-  inline
-  LExpr operator*(double lhs, const LExpr& rhs) {
+  inline LExpr operator*(double lhs, const LExpr& rhs)
+  {
     LExpr expr(rhs);
     expr *= lhs;
     return expr;
   }
 
-  inline
-  LExpr operator*(const LExpr& lhs, double rhs) {
+  inline LExpr operator*(const LExpr& lhs, double rhs)
+  {
     LExpr expr(lhs);
     expr *= rhs;
     return expr;
   }
 
-  inline
-  LExpr operator/(const LExpr& lhs, double rhs) {
+  inline LExpr operator/(const LExpr& lhs, double rhs)
+  {
     LExpr expr(lhs);
     expr /= rhs;
     return expr;
   }
 
-  inline
-  LExpr operator*(double lhs, VariableId rhs) {
+  inline LExpr operator*(double lhs, VariableId rhs)
+  {
     return { lhs, rhs };
   }
 
-  inline
-  LExpr operator*(VariableId lhs, double rhs) {
+  inline LExpr operator*(VariableId lhs, double rhs)
+  {
     return { rhs, lhs };
   }
-
 
   class LQP_API QExpr {
   public:
@@ -172,59 +172,58 @@ namespace lqp {
     std::vector<ExprQuadraticTerm> m_quadratic_terms;
   };
 
-
-  inline
-  QExpr operator+(const QExpr& lhs, const QExpr& rhs) {
+  inline QExpr operator+(const QExpr& lhs, const QExpr& rhs)
+  {
     QExpr expr(lhs);
     expr += rhs;
     return expr;
   }
 
-  inline
-  QExpr operator-(const QExpr& lhs, const QExpr& rhs) {
+  inline QExpr operator-(const QExpr& lhs, const QExpr& rhs)
+  {
     QExpr expr(lhs);
     expr -= rhs;
     return expr;
   }
 
-  inline
-  QExpr operator*(double lhs, const QExpr& rhs) {
+  inline QExpr operator*(double lhs, const QExpr& rhs)
+  {
     QExpr expr(rhs);
     expr *= lhs;
     return expr;
   }
 
-  inline
-  QExpr operator*(const QExpr& lhs, double rhs) {
+  inline QExpr operator*(const QExpr& lhs, double rhs)
+  {
     QExpr expr(lhs);
     expr *= rhs;
     return expr;
   }
 
-  inline
-  QExpr operator/(const QExpr& lhs, double rhs) {
+  inline QExpr operator/(const QExpr& lhs, double rhs)
+  {
     QExpr expr(lhs);
     expr /= rhs;
     return expr;
   }
 
-  inline
-  QExpr operator*(VariableId lhs, VariableId rhs) {
+  inline QExpr operator*(VariableId lhs, VariableId rhs)
+  {
     return { lhs, rhs };
   }
 
-  inline
-  QExpr operator*(VariableId lhs, const LExpr& rhs) {
+  inline QExpr operator*(VariableId lhs, const LExpr& rhs)
+  {
     return { LExpr(lhs), rhs };
   }
 
-  inline
-  QExpr operator*(const LExpr& lhs, VariableId rhs) {
+  inline QExpr operator*(const LExpr& lhs, VariableId rhs)
+  {
     return { lhs, LExpr(rhs) };
   }
 
-  inline
-  QExpr operator*(const LExpr& lhs, const LExpr& rhs) {
+  inline QExpr operator*(const LExpr& lhs, const LExpr& rhs)
+  {
     return { lhs, rhs };
   }
 

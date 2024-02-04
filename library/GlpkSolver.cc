@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 // Copyright (c) 2023-2024 Julien Bernard
+
+// clang-format off: main header
 #include <lqp/GlpkSolver.h>
-#include "lqp/Solution.h"
+// clang-format on
 
 #include <cassert>
 #include <cstdio>
@@ -10,6 +12,7 @@
 #include <memory>
 
 #include <glpk.h>
+
 
 namespace lqp {
   namespace {
@@ -21,7 +24,8 @@ namespace lqp {
       std::vector<double> coefficients;
     };
 
-    SolutionStatus to_solver_status(int val) {
+    SolutionStatus to_solver_status(int val)
+    {
       switch (val) {
         case GLP_OPT:
           return SolutionStatus::Optimal;
@@ -43,7 +47,8 @@ namespace lqp {
     }
 
     template<typename T, typename U>
-    void define_variables(glp_prob* prob, const std::vector<T>& variables, const U& objective) {
+    void define_variables(glp_prob* prob, const std::vector<T>& variables, const U& objective)
+    {
       glp_add_cols(prob, static_cast<int>(variables.size()));
 
       std::size_t col_index = 0;
@@ -85,7 +90,7 @@ namespace lqp {
             break;
         }
 
-        const double coefficient = objective.expression.linear_coefficient(VariableId{col_index});
+        const double coefficient = objective.expression.linear_coefficient(VariableId{ col_index });
 
         if (coefficient != 0.0) {
           glp_set_obj_coef(prob, col, coefficient);
@@ -128,7 +133,7 @@ namespace lqp {
 
         auto linear_terms = constraint.expression.linear_terms();
 
-        for (auto & term : linear_terms) {
+        for (auto& term : linear_terms) {
           assert(term.coefficient != 0.0);
           const int variable_col = static_cast<int>(to_index(term.variable) + 1);
 
@@ -163,7 +168,7 @@ namespace lqp {
 
         if (status == SolutionStatus::Optimal || status == SolutionStatus::Feasible) {
           for (std::size_t variable_index = 0; variable_index < variables.size(); ++variable_index) {
-            solution.set_value(VariableId{variable_index}, glp_mip_col_val(prob, static_cast<int>(variable_index + 1)));
+            solution.set_value(VariableId{ variable_index }, glp_mip_col_val(prob, static_cast<int>(variable_index + 1)));
           }
         }
 
@@ -195,7 +200,7 @@ namespace lqp {
 
         if (status == SolutionStatus::Optimal || status == SolutionStatus::Feasible) {
           for (std::size_t variable_index = 0; variable_index < variables.size(); ++variable_index) {
-            solution.set_value(VariableId{variable_index},  glp_get_col_prim(prob, static_cast<int>(variable_index + 1)));
+            solution.set_value(VariableId{ variable_index }, glp_get_col_prim(prob, static_cast<int>(variable_index + 1)));
           }
         }
 
@@ -207,11 +212,13 @@ namespace lqp {
 
   }
 
-  bool GlpkSolver::available() const {
+  bool GlpkSolver::available() const
+  {
     return true;
   }
 
-  Solution GlpkSolver::solve(const Problem& problem, const SolverConfig& config) {
+  Solution GlpkSolver::solve(const Problem& problem, const SolverConfig& config)
+  {
     Problem linear_problem = problem;
 
     if (!linear_problem.is_linear()) {
@@ -288,5 +295,3 @@ namespace lqp {
   }
 
 }
-
-

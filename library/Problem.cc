@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 // Copyright (c) 2023-2024 Julien Bernard
+
+// clang-format off: main header
 #include <lqp/Problem.h>
+// clang-format on
 
 #include <cassert>
 #include <cmath>
@@ -24,7 +27,8 @@ namespace lqp {
     }
   }
 
-  VariableId Problem::add_variable(VariableCategory category, std::string name) {
+  VariableId Problem::add_variable(VariableCategory category, std::string name)
+  {
     Variable variable;
 
     variable.category = category;
@@ -41,10 +45,11 @@ namespace lqp {
 
     const std::size_t index = m_variables.size();
     m_variables.push_back(std::move(variable));
-    return VariableId{index};
+    return VariableId{ index };
   }
 
-  VariableId Problem::add_variable(VariableCategory category, VariableRange range, std::string name) {
+  VariableId Problem::add_variable(VariableCategory category, VariableRange range, std::string name)
+  {
     Variable variable;
 
     variable.category = category;
@@ -53,10 +58,11 @@ namespace lqp {
 
     const std::size_t index = m_variables.size();
     m_variables.push_back(std::move(variable));
-    return VariableId{index};
+    return VariableId{ index };
   }
 
-  ConstraintId Problem::add_constraint(Inequality inequality, std::string name) {
+  ConstraintId Problem::add_constraint(Inequality inequality, std::string name)
+  {
     Constraint constraint;
 
     constraint.expression = std::move(inequality.expression);
@@ -77,14 +83,16 @@ namespace lqp {
 
     const std::size_t index = m_constraints.size();
     m_constraints.push_back(std::move(constraint));
-    return ConstraintId{index};
+    return ConstraintId{ index };
   }
 
-  void Problem::set_objective(Sense sense, const LExpr& expr, std::string name) {
+  void Problem::set_objective(Sense sense, const LExpr& expr, std::string name)
+  {
     m_objective = { sense, expr, std::move(name) };
   }
 
-  std::string Problem::variable_name(VariableId variable) const {
+  std::string Problem::variable_name(VariableId variable) const
+  {
     const std::size_t index = to_index(variable);
     assert(index < m_variables.size());
 
@@ -95,13 +103,15 @@ namespace lqp {
     return "v" + std::to_string(index);
   }
 
-  bool Problem::is_linear() const {
+  bool Problem::is_linear() const
+  {
     return std::all_of(m_constraints.begin(), m_constraints.end(), [](const Constraint& constraint) {
       return constraint.expression.is_linear();
     });
   }
 
-  std::optional<Problem> Problem::linearize() const {
+  std::optional<Problem> Problem::linearize() const
+  {
     if (is_linear()) {
       return *this;
     }
@@ -129,14 +139,14 @@ namespace lqp {
     QExpr expression = constraint.expression.constant();
     auto linear_terms = constraint.expression.linear_terms();
 
-    for (auto & term : linear_terms) {
+    for (auto& term : linear_terms) {
       expression += term.coefficient * term.variable;
     }
 
     std::map<std::tuple<VariableId, VariableId>, VariableId> mapping;
     auto quadratic_terms = constraint.expression.quadratic_terms();
 
-    for (auto & term : quadratic_terms) {
+    for (auto& term : quadratic_terms) {
       auto v0 = term.variables[0];
       auto v1 = term.variables[1];
 
@@ -193,13 +203,14 @@ namespace lqp {
     return true;
   }
 
-  bool Problem::is_feasible(const Solution& solution) const {
+  bool Problem::is_feasible(const Solution& solution) const
+  {
     // 1. verify that the variables well defined
 
     std::size_t index = 0;
 
     for (const auto& problem_variable : m_variables) {
-      const VariableId variable{index};
+      const VariableId variable{ index };
       const double value = solution.value(variable);
 
       switch (problem_variable.category) {
@@ -240,11 +251,13 @@ namespace lqp {
     });
   }
 
-  double Problem::compute_objective_value(const Solution& solution) const {
+  double Problem::compute_objective_value(const Solution& solution) const
+  {
     return m_objective.expression.evaluate(solution);
   }
 
-  void Problem::print_to(std::ostream& out) const {
+  void Problem::print_to(std::ostream& out) const
+  {
     switch (m_objective.sense) {
       case Sense::Maximize:
         out << "Maximize";
@@ -295,7 +308,8 @@ namespace lqp {
     }
   }
 
-  void Problem::print_expr_to(const QExpr& expr, std::ostream& out) const {
+  void Problem::print_expr_to(const QExpr& expr, std::ostream& out) const
+  {
     bool first = true;
 
     const double constant = expr.constant();
@@ -307,7 +321,7 @@ namespace lqp {
 
     auto linear_terms = expr.linear_terms();
 
-    for (auto & term : linear_terms) {
+    for (auto& term : linear_terms) {
       if (first) {
         first = false;
       } else {
@@ -319,7 +333,7 @@ namespace lqp {
 
     auto quadratic_terms = expr.quadratic_terms();
 
-    for (auto & term : quadratic_terms) {
+    for (auto& term : quadratic_terms) {
       if (first) {
         first = false;
       } else {

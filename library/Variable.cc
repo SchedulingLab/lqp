@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 // Copyright (c) 2023-2024 Julien Bernard
+
+// clang-format off: main header
 #include <lqp/Variable.h>
+// clang-format on
 
 #include <cassert>
 
+
 namespace lqp {
 
-  bool VariableRange::has_value(double value) const {
+  bool VariableRange::has_value(double value) const
+  {
     switch (type) {
       case Unbounded:
         return true;
@@ -24,19 +29,23 @@ namespace lqp {
     return true;
   }
 
-  VariableRange upper_bound(double value) {
+  VariableRange upper_bound(double value)
+  {
     return { VariableRange::UpperBounded, value, value };
   }
 
-  VariableRange lower_bound(double value) {
+  VariableRange lower_bound(double value)
+  {
     return { VariableRange::LowerBounded, value, value };
   }
 
-  VariableRange bounds(double lower, double upper) {
+  VariableRange bounds(double lower, double upper)
+  {
     return { VariableRange::Bounded, lower, upper };
   }
 
-  VariableRange fixed(double value) {
+  VariableRange fixed(double value)
+  {
     return { VariableRange::Fixed, value, value };
   }
 
